@@ -4,7 +4,7 @@ import scipy.optimize as sopt
 from scipy.special import expit as sigmoid
 
 
-def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=0.3):
+def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=1):
     """Solve min_W L(W; X) + lambda1 ‖W‖_1 s.t. h(W) = 0 using augmented Lagrangian.
 
     Args:
@@ -110,16 +110,18 @@ if __name__ == '__main__':
     # print(B_test.shape,"lol")
 
 
-    # import pandas as pd
-    # df = pd.read_csv('data.csv')
+    
+
+    import pandas as pd
+    df = pd.read_csv('data.csv')
     # X_ = df.loc[:, df.columns != 'Survival Time']
-    # # print(X_.shape)
-    # # exit(0)
+    # print(X_.shape)
+    # exit(0)
 
     # X_ = X_.to_numpy()
-    # # print(X_.shape)
-    # # print(type(X_))
-    # y = df['Survival Time']
+    # print(X_.shape)
+    # print(type(X_))
+    y = df['Survival Time']
     # y = y.to_numpy()
 
     
@@ -127,7 +129,7 @@ if __name__ == '__main__':
     
 
     
-    W_est = notears_linear(X_, y, lambda1=0.1, loss_type='l2')
+    W_est = notears_linear(df.to_numpy(), y, lambda1=0.1, loss_type='l2')
     # print(W_est.shape)
     print(B_true.shape)
     assert utils.is_dag(W_est)

@@ -68,7 +68,7 @@ def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1
         # G_g = -2*(X_@beta).T @ g_x                #L2 norm
         # print(G_g)
 
-        return abs(g_x)*(10**-8), G_g*(10**-14)
+        return abs(g_x)*(10**-7), G_g*(10**-10)
 
     def _adj(w):
         """Convert doubled variables ([2 d^2] array) back to original variables ([d, d] matrix)."""

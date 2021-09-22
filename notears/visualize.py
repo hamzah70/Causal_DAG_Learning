@@ -29,7 +29,7 @@ for i in range(rows):
         if adjacent[i][j] != 0:
             G.add_edge(i, j)
 
-nodes = [0, 1, 7, 8]
+nodes = [0, 1, 21, 26]
 for i in nodes:
     print(labels[i+1])
 nx.draw(G, with_labels=True)
