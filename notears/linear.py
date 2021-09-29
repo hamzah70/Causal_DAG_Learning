@@ -165,6 +165,18 @@ if __name__ == '__main__':
     y = df['Survival Time']
     y = y.to_numpy()
 
+
+    ## BOSTON DATASET
+
+    df = pd.read_csv('boston.csv')
+    X_ = df.loc[:, df.columns != 'MEDV']
+    X_ = X_.to_numpy()
+    print(X_.shape)
+
+    y = df['MEDV']
+    y = y.to_numpy()
+
+
     W_est = notears_linear(X_, y, lambda1=0.1, loss_type='l2')
     assert utils.is_dag(W_est)
     print(W_est.shape)
