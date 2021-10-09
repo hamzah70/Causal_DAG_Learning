@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 import pandas as pd
 
 
-def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=0.3, g_tol=1e-8):
+def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=0.3, g_tol=1e-8, target_node=0):
     """Solve min_W L(W; X) + lambda1 ‖W‖_1 s.t. h(W) = 0 using augmented Lagrangian.
 
     Args:
@@ -23,18 +23,19 @@ def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1
     """
     def _loss(W):
         """Evaluate value and gradient of loss."""
-        M = X @ W
+        # print(X.shape, W.shape)
+        M = X_full @ W
         if loss_type == 'l2':
-            R = X - M
-            loss = 0.5 / X.shape[0] * (R ** 2).sum()
-            G_loss = - 1.0 / X.shape[0] * X.T @ R
+            R = X_full - M
+            loss = 0.5 / X_full.shape[0] * (R ** 2).sum()
+            G_loss = - 1.0 / X_full.shape[0] * X_full.T @ R
         elif loss_type == 'logistic':
-            loss = 1.0 / X.shape[0] * (np.logaddexp(0, M) - X * M).sum()
-            G_loss = 1.0 / X.shape[0] * X.T @ (sigmoid(M) - X)
+            loss = 1.0 / X_full.shape[0] * (np.logaddexp(0, M) - X_full * M).sum()
+            G_loss = 1.0 / X_full.shape[0] * X.T @ (sigmoid(M) - X_full)
         elif loss_type == 'poisson':
             S = np.exp(M)
-            loss = 1.0 / X.shape[0] * (S - X * M).sum()
-            G_loss = 1.0 / X.shape[0] * X.T @ (S - X)
+            loss = 1.0 / X_full.shape[0] * (S - X_full * M).sum()
+            G_loss = 1.0 / X_full.shape[0] * X.T @ (S - X_full)
         else:
             raise ValueError('unknown loss type')
         return loss, G_loss
@@ -51,6 +52,8 @@ def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1
         return h, G_h
 
     def _g(X_, W_, y, beta):
+        W_ = np.delete(W_, target_node, axis=1)
+        W_ = np.delete(W_, target_node, axis=0)
 
         d = W_.shape[0]
         z = X_ - X_ @ (W_.T)
@@ -95,7 +98,7 @@ def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1
         # print(g_obj.shape)
         return obj, g_obj
 
-    n, d = X.shape
+    n, d = X_full.shape
     w_est, rho, alpha, gamma, h, g = np.zeros(
         2 * d * d), 1.0, 0.0, 0.0, np.inf, np.inf  # double w_est into (w_pos, w_neg)
     bnds = [(0, 0) if i == j else (0, None)
@@ -117,7 +120,7 @@ def notears_linear(X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1
             if h_new > 0.25 * h:
                 rho *= 10
             else:
-                # print("2")
+                print("2")
                 break
         w_est, h, g = w_new, h_new, g_new
         alpha += rho * h
@@ -148,36 +151,38 @@ if __name__ == '__main__':
 
     target_node = 10
     X_ = np.delete(X, target_node, axis=1)
-    W_ = np.delete(W_true, target_node, axis=1)
-    W_ = np.delete(W_, target_node, axis=0)
+    # W_ = np.delete(W_true, target_node, axis=1)
+    # W_ = np.delete(W_, target_node, axis=0)
     y = X[:, target_node]
-    B_test = np.delete(B_true, target_node, axis=1)
-    B_test = np.delete(B_test, target_node, axis=0)
+    # B_test = np.delete(B_true, target_node, axis=1)
+    # B_test = np.delete(B_test, target_node, axis=0)
+    B_test = B_true
 
     # print(X_.shape)
     # print(type(X_))
 
-    df = pd.read_csv('data.csv')
-    X_ = df.loc[:, df.columns != 'Survival Time']
-    X_ = X_.to_numpy()
-    print(X_.shape)
+    # df = pd.read_csv('data.csv')
+    # X_ = df.loc[:, df.columns != 'Survival Time']
+    # X_ = X_.to_numpy()
+    # print(X_.shape)
 
-    y = df['Survival Time']
-    y = y.to_numpy()
-
-
-    ## BOSTON DATASET
-
-    df = pd.read_csv('boston.csv')
-    X_ = df.loc[:, df.columns != 'MEDV']
-    X_ = X_.to_numpy()
-    print(X_.shape)
-
-    y = df['MEDV']
-    y = y.to_numpy()
+    # y = df['Survival Time']
+    # y = y.to_numpy()
 
 
-    W_est = notears_linear(X_, y, lambda1=0.1, loss_type='l2')
+    # ## BOSTON DATASET
+
+    # df = pd.read_csv('boston.csv')
+    # X_ = df.loc[:, df.columns != 'MEDV']
+    # X_ = X_.to_numpy()
+    # print(X_.shape)
+
+    # y = df['MEDV']
+    # y = y.to_numpy()
+
+    # X = df.to_numpy()
+
+    W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=10)
     assert utils.is_dag(W_est)
     print(W_est.shape)
     np.savetxt('W_est.csv', W_est, delimiter=',')
