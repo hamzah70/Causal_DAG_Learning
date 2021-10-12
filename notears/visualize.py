@@ -29,6 +29,17 @@ for i in range(rows):
         if adjacent[i][j] != 0:
             G.add_edge(i, j)
 
+ans=[]
+for i in range(rows):
+    if adjacent[i][13]!=0:
+        ans.append(i)
+
+print(ans)
+
+#CHAS, RM, DIS, PT-RATIO
+
+# G.add_edge(50,60)
+
 # nodes = [0, 1, 21, 26]
 # for i in nodes:
 #     print(labels[i+1])
