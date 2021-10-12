@@ -71,7 +71,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         # G_g = -2*(X_@beta).T @ g_x                #L2 norm
         # print(G_g)
 
-        return abs(g_x)*(10**-7), G_g*(10**-10)
+        return abs(g_x)*(10**-6), G_g*(10**-10)
 
     def _adj(w):
         """Convert doubled variables ([2 d^2] array) back to original variables ([d, d] matrix)."""
@@ -84,7 +84,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         loss, G_loss = _loss(W)
         h, G_h = _h(W)
         g, G_g = _g(X_, W, y, beta)
-        obj = loss + 0.5 * rho * h * h + 0.5 * rho * g * \
+        obj = loss + 0.5 * rho * h * h + 0.5  * g * \
             g + alpha * h + gamma * g + lambda1 * w.sum()
         # print(obj)
         g_term = (gamma + rho * g) * G_g
@@ -172,15 +172,15 @@ if __name__ == '__main__':
 
     # ## BOSTON DATASET
 
-    # df = pd.read_csv('boston.csv')
-    # X_ = df.loc[:, df.columns != 'MEDV']
-    # X_ = X_.to_numpy()
-    # print(X_.shape)
+    df = pd.read_csv('boston.csv')
+    X_ = df.loc[:, df.columns != 'MEDV']
+    X_ = X_.to_numpy()
+    print(X_.shape)
 
-    # y = df['MEDV']
-    # y = y.to_numpy()
+    y = df['MEDV']
+    y = y.to_numpy()
 
-    # X = df.to_numpy()
+    X = df.to_numpy()
 
     W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=10)
     assert utils.is_dag(W_est)

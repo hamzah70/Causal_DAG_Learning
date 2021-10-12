@@ -32,5 +32,5 @@ for i in range(rows):
 # nodes = [0, 1, 21, 26]
 # for i in nodes:
 #     print(labels[i+1])
-nx.draw(G)
+nx.draw(G, with_labels=True)
 plt.show()
