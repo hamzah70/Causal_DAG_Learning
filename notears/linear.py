@@ -161,15 +161,27 @@ if __name__ == '__main__':
     # print(X_.shape)
     # print(type(X_))
 
+
     ### METABRIC
     df = pd.read_csv('data.csv')
     X_ = df.loc[:, df.columns != 'Survival Time']
     X_ = X_.to_numpy()
     print(X_.shape)
-
     y = df['Survival Time']
     y = y.to_numpy()
     X = df.to_numpy()
+
+
+    ### BOSTON DATASET
+    # df = pd.read_csv('boston.csv')
+    # X_ = df.loc[:, df.columns != 'MEDV']
+    # X_ = X_.to_numpy()
+    # print(X_.shape)
+
+    # y = df['MEDV']
+    # y = y.to_numpy()
+
+    # X = df.to_numpy()
 
     ### BOSTON DATASET
     # df = pd.read_csv('boston.csv')
