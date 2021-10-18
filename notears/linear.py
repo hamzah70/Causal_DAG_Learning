@@ -161,30 +161,29 @@ if __name__ == '__main__':
     # print(X_.shape)
     # print(type(X_))
 
-    # df = pd.read_csv('data.csv')
-    # X_ = df.loc[:, df.columns != 'Survival Time']
-    # X_ = X_.to_numpy()
-    # print(X_.shape)
-
-    # y = df['Survival Time']
-    # y = y.to_numpy()
-
-
-    # ## BOSTON DATASET
-
-    df = pd.read_csv('boston.csv')
-    X_ = df.loc[:, df.columns != 'MEDV']
+    ### METABRIC
+    df = pd.read_csv('data.csv')
+    X_ = df.loc[:, df.columns != 'Survival Time']
     X_ = X_.to_numpy()
     print(X_.shape)
 
-    y = df['MEDV']
+    y = df['Survival Time']
     y = y.to_numpy()
-
     X = df.to_numpy()
+
+    ### BOSTON DATASET
+    # df = pd.read_csv('boston.csv')
+    # X_ = df.loc[:, df.columns != 'MEDV']
+    # X_ = X_.to_numpy()
+    # print(X_.shape)
+
+    # y = df['MEDV']
+    # y = y.to_numpy()
+    # X = df.to_numpy()
 
     W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=10)
     assert utils.is_dag(W_est)
     print(W_est.shape)
-    np.savetxt('W_est.csv', W_est, delimiter=',')
+    np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
     acc = utils.count_accuracy(B_test, W_est != 0)
     print(acc)
