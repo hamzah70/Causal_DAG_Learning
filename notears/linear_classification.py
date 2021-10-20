@@ -85,17 +85,8 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         denominator = 1+e
         numerator = 1
         val = numerator / denominator
-        g = np.zeros(val.shape)
-        for i in range(val.shape[0]):
-            if val[i][0]<0.5:
-                g[i][0]=0
-            else:
-                g[i][0]=1
-        g_x = y - g
-        g_x = g_x.sum()
-
-        G_g = -(derivative) @ np.sign(y - g) ### Derivative not complete
-            
+        print(val)
+        exit(0)
 
 
     def _adj(w):
