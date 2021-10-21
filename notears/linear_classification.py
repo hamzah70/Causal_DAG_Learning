@@ -190,6 +190,7 @@ if __name__ == '__main__':
     y = y.to_numpy()
     X = df.to_numpy()
 
+    def
 
     ### BOSTON DATASET
     # df = pd.read_csv('boston.csv')
