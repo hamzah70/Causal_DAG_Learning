@@ -133,6 +133,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         W = _adj(w)
         loss, G_loss = _loss(W)
         h, G_h = _h(W)
+        # uncomment based on regression or classification
         # g, G_g = _g(X_, W, y, beta)
         g, G_g = _g_classification(X, W, y, beta)
         obj = loss + 0.5 * rho * h * h + 0.5  * g * \
@@ -155,6 +156,8 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
     bnds = [(0, 0) if i == j else (0, None)
             for _ in range(2) for i in range(d) for j in range(d)]
 
+
+    # uncomment based on regression or classification
     # reg = LinearRegression().fit(X_, y)
     # beta = reg.coef_
 

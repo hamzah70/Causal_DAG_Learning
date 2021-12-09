@@ -18,20 +18,22 @@ def read_csv(filename):
 if __name__ == '__main__':
 
     ### BOSTON REGRESSION
-    # X_added = np.array(read_csv('W_est_boston.csv'))
-    # X = np.array(read_csv('W_est_boston_original.csv'))
+    X_added = np.array(read_csv('W_est_boston.csv'))
+    X = np.array(read_csv('W_est_boston_original.csv'))
 
     ### METABRIC REGRESSION
     X_added = np.array(read_csv('W_est_metabric.csv'))
     X = np.array(read_csv('W_est_metabric_original.csv'))
 
-    # ### METABRIC CLASSIFICATION
-    # X_added = np.array(read_csv('W_est_metabric_classification.csv'))
-    # X = np.array(read_csv('W_est_metabric_original.csv'))
+    ### METABRIC CLASSIFICATION
+    X_added = np.array(read_csv('W_est_metabric_classification.csv'))
+    X = np.array(read_csv('W_est_metabric_original.csv'))
 
     print(X_added.shape)
     print(X.shape)
     
     acc = utils.count_accuracy(X, X_added != 0)
+    mse = ((X - X_added)**2).mean(axis=None)
+    print('Mean Squared Error', mse)
 
     print(acc)
