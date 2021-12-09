@@ -95,6 +95,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         val = numerator / denominator
         g = np.zeros((val.shape[0],))
         for i in range(val.shape[0]):
+            # print(val)
             if val[i][0]<0.5:
                 g[i]=0
             else:
@@ -115,10 +116,10 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         # print(derivative.shape, (np.sign(y - g)).shape)
 
         G_g = np.nan_to_num(-(derivative) @ np.sign(y - g)) ### Derivative not complete
-        print(g_x, G_g[0])
+        # print(g_x, G_g[0])
 
         # return abs(g_x), G_g
-        return abs(g_x)*(10**-6), G_g[0]*(10**-10)
+        return abs(g_x)*(10**-6), G_g[0]*(10**-9)
             
 
 
@@ -133,7 +134,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         loss, G_loss = _loss(W)
         h, G_h = _h(W)
         # g, G_g = _g(X_, W, y, beta)
-        g, G_g = _g_classification(X_, W, y, beta)
+        g, G_g = _g_classification(X, W, y, beta)
         obj = loss + 0.5 * rho * h * h + 0.5  * g * \
             g + alpha * h + gamma * g + lambda1 * w.sum()
         # print(obj)
@@ -229,7 +230,8 @@ if __name__ == '__main__':
     # X = df.to_numpy()
 
     ## METABRIC CLASSIFICATION
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('data.csv').dropna()
+
     X_ = df.loc[:, df.columns != 'Survival Time']
     X_ = X_.to_numpy()
     print(X_.shape)
@@ -249,7 +251,7 @@ if __name__ == '__main__':
 
 
 
-    ### BOSTON DATASET
+    ## BOSTON DATASET
     # df = pd.read_csv('boston.csv')
     # X_ = df.loc[:, df.columns != 'MEDV']
     # X_ = X_.to_numpy()
@@ -265,7 +267,8 @@ if __name__ == '__main__':
     W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=34)
     assert utils.is_dag(W_est)
     print(W_est.shape)
-    np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
+    np.savetxt('W_est_metabric_classification.csv', W_est, delimiter=',')
+    # np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
     # np.savetxt('W_est_boston.csv', W_est, delimiter=',')
     acc = utils.count_accuracy(B_test, W_est != 0)
     print(acc)
