@@ -5,6 +5,7 @@ from sklearn import preprocessing
 from scipy.special import expit as sigmoid
 from sklearn.linear_model import LinearRegression, LogisticRegression
 import pandas as pd
+import warnings
 
 
 def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=0.3, g_tol=1e-8, target_node=0):
@@ -171,6 +172,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
 
 if __name__ == '__main__':
     import utils
+    warnings.filterwarnings("ignore")
     utils.set_random_seed(1)
 
     n, d, s0, graph_type, sem_type = 100, 20, 20, 'ER', 'gauss'
@@ -242,4 +244,4 @@ if __name__ == '__main__':
     # np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
     # np.savetxt('W_est_boston.csv', W_est, delimiter=',')
     acc = utils.count_accuracy(B_test, W_est != 0)
-    # print(acc)
+    print(acc)
