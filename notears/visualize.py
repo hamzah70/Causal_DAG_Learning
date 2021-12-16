@@ -15,8 +15,6 @@ adjacent = pd.read_csv('W_est_metabric.csv', header=None)
 # exit(0)
 adjacent.reset_index(drop=True, inplace=True)
 
-# print(adjacent)
-
 rows = adjacent.shape[0]
 columns = adjacent.shape[1]
 adjacent = adjacent.to_numpy()

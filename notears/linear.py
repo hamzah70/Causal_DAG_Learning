@@ -24,7 +24,6 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
     """
     def _loss(W):
         """Evaluate value and gradient of loss."""
-        # print(X.shape, W.shape)
         M = X_full @ W
         if loss_type == 'l2':
             R = X_full - M
@@ -59,24 +58,12 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         d = W_.shape[0]
         z = X_ - X_ @ (W_.T)
 
-        # T_ = np.linalg.inv((np.identity(d) - (W_)))
-
-        # g_x = y - beta @ W_.T @ X_.T - beta @ z.T
-        # print(X_.shape, W_.shape, beta.shape)
-
         g_x = y - X_@W_@beta - z@beta
         g_x = g_x.sum()  # L1 norm
         # g_x = max(g_x) #INFINITY NORM
-        # temp = [i**2 for i in g_x]
-        # result_g_x = sum(temp)
 
         G_g = -(X_@beta).T @ np.sign(y - (X_@W_ + z) @ beta)  # L1 norm
         # G_g = -2*(X_@beta).T @ g_x                #L2 norm
-        # print(G_g)
-
-
-        # print(g_x, G_g, 'HELLOHOW')
-
         return abs(g_x)*(10**-6), G_g*(10**-10)
 
     def _g_classification(X_, W_, y, beta):
@@ -87,38 +74,25 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         z = X_ - X_ @ (W_.T)
 
         power = X_@W_@beta + z@beta
-
         e = np.nan_to_num(np.exp(-1*power))
-        # print(e)
         denominator = 1+e
         numerator = 1
         val = numerator / denominator
         g = np.zeros((val.shape[0],))
         for i in range(val.shape[0]):
-            # print(val)
             if val[i][0]<0.5:
                 g[i]=0
             else:
                 g[i]=1
         g_x = y - g
-        # print(y.shape, g.shape)
-        # print(y, g)
         g_x = g_x.sum()
 
         part1 = np.nan_to_num(1/(denominator**2))
         part2 = e.T
         part3 = -(X_@beta)
 
-        # print(part1.shape, part2.shape, part3.shape)
-
         derivative = np.nan_to_num((part1@part2@part3).T)
-
-        # print(derivative.shape, (np.sign(y - g)).shape)
-
-        G_g = np.nan_to_num(-(derivative) @ np.sign(y - g)) ### Derivative not complete
-        # print(g_x, G_g[0])
-
-        # return abs(g_x), G_g
+        G_g = np.nan_to_num(-(derivative) @ np.sign(y - g))
         return abs(g_x)*(10**-6), G_g[0]*(10**-9)
             
 
@@ -133,21 +107,21 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         W = _adj(w)
         loss, G_loss = _loss(W)
         h, G_h = _h(W)
+
+        ############################################################
         # uncomment based on regression or classification
         # g, G_g = _g(X_, W, y, beta)
         g, G_g = _g_classification(X, W, y, beta)
+        ############################################################
+
         obj = loss + 0.5 * rho * h * h + 0.5  * g * \
             g + alpha * h + gamma * g + lambda1 * w.sum()
-        # print(obj)
+    
         g_term = (gamma + rho * g) * G_g
-        # print(g_term, rho)
         G_smooth = G_loss + (rho * h + alpha) * G_h + g_term
-
-        # G_smooth_2 = g_term
 
         g_obj = np.concatenate(
             (G_smooth + lambda1, - G_smooth + lambda1), axis=None)
-        # print(g_obj.shape)
         return obj, g_obj
 
     n, d = X_full.shape
@@ -157,6 +131,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
             for _ in range(2) for i in range(d) for j in range(d)]
 
 
+    ############################################################
     # uncomment based on regression or classification
     # reg = LinearRegression().fit(X_, y)
     # beta = reg.coef_
@@ -165,6 +140,7 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
     X = scaler.transform(X)
     logistic = LogisticRegression().fit(X, y)
     beta = logistic.coef_.reshape(-1,1)
+    ############################################################
 
     g_new = 0
     if loss_type == 'l2':
@@ -181,17 +157,12 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
             if h_new > 0.25 * h:
                 rho *= 10
             else:
-                # print("2")
                 break
         w_est, h, g = w_new, h_new, g_new
         alpha += rho * h
         gamma += rho * g
 
         if h <= h_tol or rho >= rho_max or g <= g_tol:
-            # print(h, h_tol)
-            # print(rho, rho_max)
-            # print(g, g_tol)
-            # print("Breaking here")
             break
     W_est = _adj(w_est)
     W_est[np.abs(W_est) < w_threshold] = 0
@@ -224,7 +195,7 @@ if __name__ == '__main__':
 
 
     ### METABRIC
-    # df = pd.read_csv('data.csv')
+    # df = pd.read_csv('metabric.csv')
     # X_ = df.loc[:, df.columns != 'Survival Time']
     # X_ = X_.to_numpy()
     # print(X_.shape)
@@ -233,7 +204,7 @@ if __name__ == '__main__':
     # X = df.to_numpy()
 
     ## METABRIC CLASSIFICATION
-    df = pd.read_csv('data.csv').dropna()
+    df = pd.read_csv('metabric.csv').dropna()
 
     X_ = df.loc[:, df.columns != 'Survival Time']
     X_ = X_.to_numpy()
@@ -256,7 +227,6 @@ if __name__ == '__main__':
     # df = pd.read_csv('boston.csv')
     # X_ = df.loc[:, df.columns != 'MEDV']
     # X_ = X_.to_numpy()
-    # # print(X_.shape)
 
     # y = df['MEDV']
     # y = y.to_numpy()

@@ -28,9 +28,6 @@ if __name__ == '__main__':
     ### METABRIC CLASSIFICATION
     X_added = np.array(read_csv('W_est_metabric_classification.csv'))
     X = np.array(read_csv('W_est_metabric_original.csv'))
-
-    print(X_added.shape)
-    print(X.shape)
     
     acc = utils.count_accuracy(X, X_added != 0)
     mse = ((X - X_added)**2).mean(axis=None)
