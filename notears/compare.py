@@ -18,8 +18,8 @@ def read_csv(filename):
 if __name__ == '__main__':
 
     ### BOSTON REGRESSION
-    X_added = np.array(read_csv('W_est_boston.csv'))
-    X = np.array(read_csv('W_est_boston_original.csv'))
+    # X_added = np.array(read_csv('W_est_boston.csv'))
+    # X = np.array(read_csv('W_est_boston_original.csv'))
 
     ### METABRIC REGRESSION
     X_added = np.array(read_csv('W_est_metabric.csv'))

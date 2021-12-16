@@ -181,17 +181,17 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
             if h_new > 0.25 * h:
                 rho *= 10
             else:
-                print("2")
+                # print("2")
                 break
         w_est, h, g = w_new, h_new, g_new
         alpha += rho * h
         gamma += rho * g
 
         if h <= h_tol or rho >= rho_max or g <= g_tol:
-            print(h, h_tol)
-            print(rho, rho_max)
-            print(g, g_tol)
-            print("Breaking here")
+            # print(h, h_tol)
+            # print(rho, rho_max)
+            # print(g, g_tol)
+            # print("Breaking here")
             break
     W_est = _adj(w_est)
     W_est[np.abs(W_est) < w_threshold] = 0
@@ -237,7 +237,6 @@ if __name__ == '__main__':
 
     X_ = df.loc[:, df.columns != 'Survival Time']
     X_ = X_.to_numpy()
-    print(X_.shape)
     y = df['Survival Time']
     y = y.to_numpy()
 
@@ -250,7 +249,6 @@ if __name__ == '__main__':
     y = np.array(y_final)
     df['Survival Time'] = y
     X = df.to_numpy()
-    print(X.shape)
 
 
 
@@ -269,9 +267,9 @@ if __name__ == '__main__':
     ### target_node=13 for boston dataset
     W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=34)
     assert utils.is_dag(W_est)
-    print(W_est.shape)
+    # print(W_est.shape)
     np.savetxt('W_est_metabric_classification.csv', W_est, delimiter=',')
     # np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
     # np.savetxt('W_est_boston.csv', W_est, delimiter=',')
     acc = utils.count_accuracy(B_test, W_est != 0)
-    print(acc)
+    # print(acc)
