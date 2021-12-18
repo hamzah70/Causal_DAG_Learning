@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random.mtrand import weibull
 import scipy.linalg as slin
 import scipy.optimize as sopt
 from sklearn import preprocessing
@@ -6,6 +7,7 @@ from scipy.special import expit as sigmoid
 from sklearn.linear_model import LinearRegression, LogisticRegression
 import pandas as pd
 import warnings
+from original_notears import notears_linear as original_notears
 
 
 def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, rho_max=1e+16, w_threshold=0.3, g_tol=1e-8, target_node=0):
@@ -31,7 +33,8 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
             loss = 0.5 / X_full.shape[0] * (R ** 2).sum()
             G_loss = - 1.0 / X_full.shape[0] * X_full.T @ R
         elif loss_type == 'logistic':
-            loss = 1.0 / X_full.shape[0] * (np.logaddexp(0, M) - X_full * M).sum()
+            loss = 1.0 / X_full.shape[0] * \
+                (np.logaddexp(0, M) - X_full * M).sum()
             G_loss = 1.0 / X_full.shape[0] * X.T @ (sigmoid(M) - X_full)
         elif loss_type == 'poisson':
             S = np.exp(M)
@@ -81,10 +84,10 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         val = numerator / denominator
         g = np.zeros((val.shape[0],))
         for i in range(val.shape[0]):
-            if val[i][0]<0.5:
-                g[i]=0
+            if val[i][0] < 0.5:
+                g[i] = 0
             else:
-                g[i]=1
+                g[i] = 1
         g_x = y - g
         g_x = g_x.sum()
 
@@ -95,8 +98,6 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
         derivative = np.nan_to_num((part1@part2@part3).T)
         G_g = np.nan_to_num(-(derivative) @ np.sign(y - g))
         return abs(g_x)*(10**-6), G_g[0]*(10**-9)
-            
-
 
     def _adj(w):
         """Convert doubled variables ([2 d^2] array) back to original variables ([d, d] matrix)."""
@@ -111,13 +112,13 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
 
         ############################################################
         # uncomment based on regression or classification
-        # g, G_g = _g(X_, W, y, beta)
-        g, G_g = _g_classification(X, W, y, beta)
+        g, G_g = _g(X_, W, y, beta)
+        # g, G_g = _g_classification(X, W, y, beta)
         ############################################################
 
-        obj = loss + 0.5 * rho * h * h + 0.5  * g * \
+        obj = loss + 0.5 * rho * h * h + 0.5 * g * \
             g + alpha * h + gamma * g + lambda1 * w.sum()
-    
+
         g_term = (gamma + rho * g) * G_g
         G_smooth = G_loss + (rho * h + alpha) * G_h + g_term
 
@@ -131,16 +132,15 @@ def notears_linear(X_full, X, y, lambda1, loss_type, max_iter=100, h_tol=1e-8, r
     bnds = [(0, 0) if i == j else (0, None)
             for _ in range(2) for i in range(d) for j in range(d)]
 
-
     ############################################################
     # uncomment based on regression or classification
-    # reg = LinearRegression().fit(X_, y)
-    # beta = reg.coef_
+    reg = LinearRegression().fit(X_, y)
+    beta = reg.coef_
 
-    scaler = preprocessing.StandardScaler().fit(X)
-    X = scaler.transform(X)
-    logistic = LogisticRegression().fit(X, y)
-    beta = logistic.coef_.reshape(-1,1)
+    # scaler = preprocessing.StandardScaler().fit(X)
+    # X = scaler.transform(X)
+    # logistic = LogisticRegression().fit(X, y)
+    # beta = logistic.coef_.reshape(-1,1)
     ############################################################
 
     g_new = 0
@@ -175,28 +175,7 @@ if __name__ == '__main__':
     warnings.filterwarnings("ignore")
     utils.set_random_seed(1)
 
-    n, d, s0, graph_type, sem_type = 100, 20, 20, 'ER', 'gauss'
-    B_true = utils.simulate_dag(d, s0, graph_type)
-    W_true = utils.simulate_parameter(B_true)
-    np.savetxt('W_true.csv', W_true, delimiter=',')
-
-    X = utils.simulate_linear_sem(W_true, n, sem_type)
-    np.savetxt('X.csv', X, delimiter=',')
-
-    target_node = 10
-    X_ = np.delete(X, target_node, axis=1)
-    # W_ = np.delete(W_true, target_node, axis=1)
-    # W_ = np.delete(W_, target_node, axis=0)
-    y = X[:, target_node]
-    # B_test = np.delete(B_true, target_node, axis=1)
-    # B_test = np.delete(B_test, target_node, axis=0)
-    B_test = B_true
-
-    # print(X_.shape)
-    # print(type(X_))
-
-
-    ### METABRIC
+    # METABRIC
     # df = pd.read_csv('metabric.csv')
     # X_ = df.loc[:, df.columns != 'Survival Time']
     # X_ = X_.to_numpy()
@@ -205,43 +184,46 @@ if __name__ == '__main__':
     # y = y.to_numpy()
     # X = df.to_numpy()
 
-    ## METABRIC CLASSIFICATION
-    df = pd.read_csv('metabric.csv').dropna()
+    # METABRIC CLASSIFICATION
+    # df = pd.read_csv('metabric.csv').dropna()
 
-    X_ = df.loc[:, df.columns != 'Survival Time']
-    X_ = X_.to_numpy()
-    y = df['Survival Time']
-    y = y.to_numpy()
-
-    y_final = []
-    for i in range(len(y)):
-        if y[i]>=500:
-            y_final.append(1)
-        else:
-            y_final.append(0)
-    y = np.array(y_final)
-    df['Survival Time'] = y
-    X = df.to_numpy()
-
-
-
-    ## BOSTON DATASET
-    # df = pd.read_csv('boston.csv')
-    # X_ = df.loc[:, df.columns != 'MEDV']
+    # X_ = df.loc[:, df.columns != 'Survival Time']
     # X_ = X_.to_numpy()
-
-    # y = df['MEDV']
+    # y = df['Survival Time']
     # y = y.to_numpy()
+
+    # y_final = []
+    # for i in range(len(y)):
+    #     if y[i]>=500:
+    #         y_final.append(1)
+    #     else:
+    #         y_final.append(0)
+    # y = np.array(y_final)
+    # df['Survival Time'] = y
     # X = df.to_numpy()
 
-    ### REMEMBER to change the target node depending on dataset
-    ### target_node=34 for metabric dataset
-    ### target_node=13 for boston dataset
-    W_est = notears_linear(X, X_, y, lambda1=0.1, loss_type='l2', target_node=34)
+    # BOSTON DATASET
+    df = pd.read_csv('boston.csv')
+    X_ = df.loc[:, df.columns != 'MEDV']
+    X_ = X_.to_numpy()
+
+    y = df['MEDV']
+    y = y.to_numpy()
+    X = df.to_numpy()
+
+    # REMEMBER to change the target node depending on dataset
+    # target_node=34 for metabric dataset
+    # target_node=13 for boston dataset
+    W_est = notears_linear(X, X_, y, lambda1=0.1,
+                           loss_type='l2', target_node=13)
+
+    W_est_original = original_notears(X, lambda1=0.1, loss_type='l2')
+
     assert utils.is_dag(W_est)
-    # print(W_est.shape)
-    np.savetxt('W_est_metabric_classification.csv', W_est, delimiter=',')
-    # np.savetxt('W_est_metabric.csv', W_est, delimiter=',')
-    # np.savetxt('W_est_boston.csv', W_est, delimiter=',')
-    acc = utils.count_accuracy(B_test, W_est != 0)
+
+    acc = utils.count_accuracy(W_est_original, W_est != 0)
+
+    mse = ((W_est - W_est_original)**2).mean(axis=None)
+    acc['MSE'] = mse
+
     print(acc)

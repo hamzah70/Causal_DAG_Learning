@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     W_est = notears_linear(X, lambda1=0.1, loss_type='l2')
     assert utils.is_dag(W_est)
-    print(W_est.shape)
+    # print(W_est.shape)
     # np.savetxt('W_est_metabric_original.csv', W_est, delimiter=',')
     np.savetxt('W_est_boston_original.csv', W_est, delimiter=',')
     acc = utils.count_accuracy(B_true, W_est != 0)
