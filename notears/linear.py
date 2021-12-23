@@ -176,7 +176,7 @@ if __name__ == '__main__':
     utils.set_random_seed(1)
 
     # METABRIC
-    # df = pd.read_csv('metabric.csv')
+    # df = pd.read_csv('dataset/metabric.csv')
     # X_ = df.loc[:, df.columns != 'Survival Time']
     # X_ = X_.to_numpy()
     # print(X_.shape)
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     # X = df.to_numpy()
 
     # METABRIC CLASSIFICATION
-    # df = pd.read_csv('metabric.csv').dropna()
+    # df = pd.read_csv('dataset/metabric.csv').dropna()
 
     # X_ = df.loc[:, df.columns != 'Survival Time']
     # X_ = X_.to_numpy()
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     # X = df.to_numpy()
 
     # BOSTON DATASET
-    df = pd.read_csv('boston.csv')
+    df = pd.read_csv('dataset/boston.csv')
     X_ = df.loc[:, df.columns != 'MEDV']
     X_ = X_.to_numpy()
 
